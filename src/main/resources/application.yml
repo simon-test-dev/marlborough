@@ -1,0 +1,49 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+h2:
+  console:
+    enabled=true:
+logging:
+  level:
+    org.hibernate.SQL: debug
+
+resilience4j:
+  retry:
+    instances:
+      restApiService:
+        maxRetryAttempts: 5
+        waitDuration: 500
+  ratelimiter:
+    instances:
+      kakaoRestApiService:
+        limitForPeriod: 100
+        limitRefreshPeriod: 1m
+        timeoutDuration: 500
+      naverRestApiService:
+        limitForPeriod: 100
+        limitRefreshPeriod: 1m
+        timeoutDuration: 500
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowSize: 10
+        slidingWindowType: COUNT_BASED
+        failureRateThreshold: 50
+        waitDurationInOpenState: 5000
+        minimumNumberOfCalls: 10
+        permittedNumberOfCallsInHalfOpenState: 1
+    instances:
+      mapCircuit:
+        baseConfig: default
+        failureRateThreshold: 50
